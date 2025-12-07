@@ -1,11 +1,10 @@
-// app.js 기본 파일
+// app.js
 
 /**
  * 사용자 행동을 LocalStorage에 기록하는 함수
  * @param {string} action - 기록할 행동 메시지 (예: "보러가기 클릭")
  */
 function logUserAction(action) {
-  // 1. 현재 날짜 및 시간 포맷팅 (YYYY-MM-DD HH:MM)
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, '0');
@@ -17,7 +16,6 @@ function logUserAction(action) {
   const logMessage = `${timestamp} ${action}`;
   console.log(`Action to log: ${logMessage}`);
 
-  // 2. LocalStorage에서 기존 로그 가져오기
   let logs = [];
   try {
     const existingLogs = localStorage.getItem('userActions');
@@ -26,10 +24,9 @@ function logUserAction(action) {
     }
   } catch (e) {
     console.error('Failed to parse logs from LocalStorage:', e);
-    logs = []; // 파싱 실패 시 초기화
+    logs = [];
   }
 
-  // 3. 새로운 로그 추가하고 다시 저장하기
   logs.push(logMessage);
   localStorage.setItem('userActions', JSON.stringify(logs));
 }
@@ -60,22 +57,31 @@ document.addEventListener('DOMContentLoaded', () => {
   const surveyBtn2 = document.getElementById('survey-btn-2');
   const boardBtn = document.getElementById('board-btn');
 
+  // 각 버튼의 `onclick` 속성 내에서 logUserAction 함수를 호출하도록 수정
+  // 이렇게 하면 HTML의 `onclick`과 JS의 이벤트 리스너가 동시에 작동하는 것을 방지하고,
+  // HTML의 `onclick`을 유지하면서 로그 기능을 추가할 수 있습니다.
   if (surveyBtn1) {
-    surveyBtn1.addEventListener('click', () => {
-      logUserAction('객관식 설문 참여하기 클릭');
-    });
+    const originalOnClick = surveyBtn1.onclick;
+    surveyBtn1.onclick = function() {
+        logUserAction('객관식 설문 참여하기 클릭');
+        if (originalOnClick) originalOnClick.apply(this, arguments);
+    };
   }
   
   if (surveyBtn2) {
-    surveyBtn2.addEventListener('click', () => {
-      logUserAction('주관식 설문 참여하기 클릭');
-    });
+    const originalOnClick = surveyBtn2.onclick;
+    surveyBtn2.onclick = function() {
+        logUserAction('주관식 설문 참여하기 클릭');
+        if (originalOnClick) originalOnClick.apply(this, arguments);
+    };
   }
 
   if (boardBtn) {
-    boardBtn.addEventListener('click', () => {
-      logUserAction('게시판 보러가기 클릭');
-    });
+    const originalOnClick = boardBtn.onclick;
+    boardBtn.onclick = function() {
+        logUserAction('게시판 보러가기 클릭');
+        if (originalOnClick) originalOnClick.apply(this, arguments);
+    };
   }
 
   // --- 저장된 로그를 콘솔에 출력 ---
