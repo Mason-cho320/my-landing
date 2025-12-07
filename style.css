@@ -1,0 +1,80 @@
+/* style.css 기본 파일 */
+
+body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+    color: #333;
+}
+
+header, section {
+    background-color: #ffffff;
+    margin: 0 auto 20px auto;
+    padding: 20px 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    max-width: 800px;
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+header:hover, section:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+h1, h2 {
+    color: #760c0c; /* Burgundy */
+    margin-top: 0;
+}
+
+h1 {
+    text-align: center;
+    font-size: 2.2em;
+    border-bottom: 2px solid #760c0c;
+    padding-bottom: 10px;
+}
+
+h2 {
+    font-size: 1.8em;
+}
+
+p {
+    font-size: 1.1em;
+}
+
+ul {
+    list-style-type: '✓ '; /* Simple checkmark */
+    padding-left: 20px;
+}
+
+li {
+    margin-bottom: 10px;
+}
+
+#call-to-action {
+    text-align: center;
+}
+
+button {
+    background-color: #760c0c; /* Burgundy */
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+button:hover {
+    background-color: #5a0909; /* Darker Burgundy */
+    transform: scale(1.05);
+}
+
+button:active {
+    transform: scale(1);
+}

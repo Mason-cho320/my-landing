@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>클릭 기록 로그</title>
+    <!-- 기존 스타일시트를 재사용하여 일관된 디자인을 유지합니다. -->
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* logs.html에만 적용될 추가 스타일 */
+        .log-container {
+            margin: 0 auto;
+            max-width: 800px;
+        }
+        .log-table {
+            width: 100%;
+            border-collapse: collapse; /* 테이블 테두리를 한 줄로 만듭니다. */
+            margin-top: 20px;
+        }
+        .log-table th, .log-table td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: center;
+        }
+        .log-table th {
+            background-color: #760c0c; /* 헤더 배경색을 버건디로 설정 */
+            color: white; /* 헤더 글자색을 흰색으로 설정 */
+        }
+        /* 짝수 번째 행에 약간의 배경색을 주어 가독성을 높입니다. */
+        .log-table tbody tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>📋 사용자 행동 로그</h1>
+    </header>
+
+    <div class="log-container">
+        <table class="log-table">
+            <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>버튼 이름</th>
+                    <th>클릭 시간</th>
+                </tr>
+            </thead>
+            <!-- 자바스크립트가 이 안에 로그 데이터를 채울 것입니다. -->
+            <tbody id="log-table-body">
+                <!-- 예: <tr><td>1</td><td>게시판 보러가기</td><td>2025-01-01 13:00</td></tr> -->
+            </tbody>
+        </table>
+        <div style="text-align: center; margin-top: 20px;">
+            <button onclick="location.href='index.html'">메인으로 돌아가기</button>
+        </div>
+    </div>
+
+    <script>
+        // DOMContentLoaded 이벤트는 HTML 문서가 완전히 로드되고 파싱되었을 때 발생합니다.
+        // 즉, document.getElementById와 같은 DOM 조작을 안전하게 시작할 수 있는 시점입니다.
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // 1. LocalStorage에서 'userActions'라는 키로 저장된 데이터를 가져옵니다.
+            // 데이터는 JSON 문자열 형태로 저장되어 있습니다.
+            const storedLogsJSON = localStorage.getItem('userActions');
+
+            // 2. 테이블의 tbody 요소를 ID로 찾습니다. 여기에 로그 기록을 행(tr)으로 추가할 것입니다.
+            const logTableBody = document.getElementById('log-table-body');
+
+            // 3. 저장된 로그 데이터가 있는지 확인합니다.
+            if (storedLogsJSON) {
+                try {
+                    // JSON.parse()를 사용해 JSON 문자열을 자바스크립트 배열로 변환합니다.
+                    // 예: '["로그1", "로그2"]' -> ["로그1", "로그2"]
+                    const logs = JSON.parse(storedLogsJSON);
+
+                    // 로그가 배열이고, 내용이 비어있지 않은지 확인합니다.
+                    if (Array.isArray(logs) && logs.length > 0) {
+                        
+                        // forEach 루프를 사용해 배열의 각 로그 항목에 대해 반복 작업을 수행합니다.
+                        // log는 각 항목(예: "2025-01-01 13:00 보러가기 클릭"), index는 배열의 순서(0, 1, 2...)입니다.
+                        logs.forEach((log, index) => {
+                            
+                            // 4. 로그 문자열을 파싱하여 '시간'과 '버튼 이름'으로 분리합니다.
+                            // "YYYY-MM-DD HH:MM" 형식의 시간은 16자입니다.
+                            const time = log.substring(0, 16);
+                            // 17번째 문자부터 끝까지가 행동 설명입니다.
+                            let action = log.substring(17);
+
+                            // "클릭"이라는 단어를 제거하여 버튼 이름만 남깁니다.
+                            if (action.endsWith(' 클릭')) {
+                                action = action.slice(0, -3);
+                            }
+
+                            // 5. 새로운 테이블 행(tr)을 생성합니다.
+                            const row = document.createElement('tr');
+
+                            // 6. 행에 추가할 세 개의 셀(td)을 생성하고 내용을 채웁니다.
+                            
+                            // 번호 셀 (index는 0부터 시작하므로 +1 해줍니다)
+                            const cellNum = document.createElement('td');
+                            cellNum.textContent = index + 1;
+
+                            // 버튼 이름 셀
+                            const cellAction = document.createElement('td');
+                            cellAction.textContent = action;
+
+                            // 클릭 시간 셀
+                            const cellTime = document.createElement('td');
+                            cellTime.textContent = time;
+
+                            // 7. 생성된 셀들을 행(row)에 추가합니다.
+                            row.appendChild(cellNum);
+                            row.appendChild(cellAction);
+                            row.appendChild(cellTime);
+
+                            // 8. 완성된 행(row)을 테이블의 tbody에 추가합니다.
+                            logTableBody.appendChild(row);
+                        });
+
+                    } else {
+                        // 로그는 있지만 비어있는 배열일 경우
+                        displayNoLogsMessage();
+                    }
+                } catch (e) {
+                    // JSON 파싱 중 오류가 발생할 경우 (예: 데이터가 깨졌을 때)
+                    console.error('로그 데이터를 파싱하는 데 실패했습니다:', e);
+                    displayNoLogsMessage();
+                }
+            } else {
+                // LocalStorage에 'userActions' 데이터가 아예 없을 경우
+                displayNoLogsMessage();
+            }
+
+            // 로그가 없을 때 표시할 메시지를 생성하는 함수입니다.
+            function displayNoLogsMessage() {
+                const row = document.createElement('tr');
+                const cell = document.createElement('td');
+                cell.colSpan = 3; // 3개의 열을 하나로 합칩니다.
+                cell.textContent = '저장된 기록이 없습니다.';
+                row.appendChild(cell);
+                logTableBody.appendChild(row);
+            }
+        });
+    </script>
+
+</body>
+</html>
